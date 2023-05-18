@@ -12,7 +12,7 @@ use crate::{
     utils::{ apply_dotenv, parse_json, validate_pdf, validate_links },
 };
 
-use std::{ path::PathBuf, println };
+use std::path::PathBuf;
 
 use clap::{ Parser, ValueHint };
 
