@@ -62,10 +62,10 @@ trustblock publish-audit -a audit.json -u https://trustblock.run/my_audit
 You can obtain an example _audit.json_ file from https://github.com/Trustblock-Inc/trustblock-cli/blob/main/src/data/audit.json. You should fill in the fields with the appropriate information from your audit.
 
 
-To include auth token and private key:
+To include api key and private key:
 
 ```bash
--k, --auth-token
+-k, --api-key
 -p, --private-key
 ```
 
