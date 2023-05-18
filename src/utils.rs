@@ -10,7 +10,7 @@ use std::{ fs::File, io::BufReader, path::PathBuf, sync::Arc };
 
 use validator::{ validate_email, validate_url };
 
-use eyre::{ eyre, ContextCompat, WrapErr };
+use eyre::{ eyre, ContextCompat };
 
 use serde::de::DeserializeOwned;
 
@@ -33,7 +33,8 @@ impl Pdf for PathBuf {
 }
 
 pub fn parse_json<T: DeserializeOwned>(path: &PathBuf) -> eyre::Result<T> {
-    let file = File::open(path).wrap_err_with(|| format!("Failed to open file {path:?}"))?;
+    let file = File::open(path)?;
+
     let reader = BufReader::new(file);
     let data = serde_json::from_reader(reader)?;
 

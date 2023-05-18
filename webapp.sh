@@ -1,6 +1,12 @@
 #!/bin/bash
 
-docker compose down -v && docker compose up -d
+if [ -z "$(docker ps -f "name=app" -f "status=running" -q)" ]; then
+    docker compose up -d
+
+else
+    docker compose exec app npx prisma migrate reset -f --skip-generate &&
+        docker compose exec app npx prisma db push --skip-generate
+fi
 
 # Loop until the app is ready or we've tried 10 times
 for i in {1..10}; do
@@ -15,18 +21,15 @@ for i in {1..10}; do
 
         API_KEY=$(mysql -h127.0.0.1 -uuser -ppass local -Bse "SELECT \`key\` FROM ApiKey;")
 
-        echo $API_KEY
-
         trustblock clean && trustblock init -p $WALLET_KEY -a $API_KEY
 
-        content_to_append="\nAUDIT_ENDPOINT=$AUDIT_ENDPOINT\nPROJECT_ENDPOINT=$PROJECT_ENDPOINT\nFORWARDER_ENDPOINT=$FORWARDER_ENDPOINT\nWEB3_STORAGE_API_ENDPOINT=$WEB3_STORAGE_API_ENDPOINT\nTB_CORE_ADDRESS=$TB_CORE_ADDRESS"
+        content_to_append="\nAUDIT_ENDPOINT=$AUDIT_ENDPOINT\nPROJECT_ENDPOINT=$PROJECT_ENDPOINT\nFORWARDER_ENDPOINT=$FORWARDER_ENDPOINT\nWEB3_STORAGE_API_ENDPOINT=$WEB3_STORAGE_API_ENDPOINT\nTB_CORE_ADDRESS=$TB_CORE_ADDRESS\nPDF_GENERATE_ENDPOINT=$PDF_GENERATE_ENDPOINT"
 
         # The file you want to append to
         file_path="$HOME/.trustblock/.env"
 
         # Append the content to the file
-        echo -e "$content_to_append" >> "$file_path"
-
+        echo -e "$content_to_append" >>"$file_path"
 
         break
     else

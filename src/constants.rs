@@ -18,6 +18,8 @@ pub const FORWARDER_ENDPOINT: &str = "https://beta.trustblock.run/api/audit/forw
 
 pub const WEB3_STORAGE_API_ENDPOINT: &str = "https://beta.trustblock.run/api/file/";
 
+pub const PDF_GENERATE_ENDPOINT: &str = "https://trustblock-pdf-production.up.railway.app/pdf";
+
 pub const WEB3_STORAGE_ENDPOINT: &str = ".ipfs.w3s.link";
 
 pub const FORWARDER_GENERIC_PARAMETERS: &str =

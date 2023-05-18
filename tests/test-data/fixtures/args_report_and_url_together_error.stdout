@@ -1,0 +1,5 @@
+error: the argument '--report-pdf <AUDIT_REPORT_PDF_FILE>' cannot be used with '--report-url <AUDIT_REPORT_URL>'
+
+Usage: trustblock publish-audit --audit-data <AUDIT_DATA_JSON_FILE> --report-pdf <AUDIT_REPORT_PDF_FILE> --report-url <AUDIT_REPORT_URL>
+
+For more information, try '--help'.

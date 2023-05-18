@@ -89,7 +89,7 @@ fn test_init_args_success() -> eyre::Result<()> {
         .arg("-p")
         .arg("some_private_key")
         .arg("-a")
-        .arg("some_auth_token")
+        .arg("some_api_key")
         .assert()
         .success()
         .stdout(predicate::path::eq_file(init_fixture_path));
@@ -110,7 +110,7 @@ fn test_init_args_incorrect_args_fail() -> eyre::Result<()> {
         .arg("-d")
         .arg("some_private_key")
         .arg("-a")
-        .arg("some_auth_token")
+        .arg("some_api_key")
         .assert()
         .failure();
 
@@ -119,7 +119,7 @@ fn test_init_args_incorrect_args_fail() -> eyre::Result<()> {
         .arg("-p")
         .arg("some_private_key")
         .arg("-c")
-        .arg("some_auth_token")
+        .arg("some_api_key")
         .assert()
         .failure();
 
@@ -128,7 +128,7 @@ fn test_init_args_incorrect_args_fail() -> eyre::Result<()> {
         .arg("--privadte-key")
         .arg("some_private_key")
         .arg("-a")
-        .arg("some_auth_token")
+        .arg("some_api_key")
         .assert()
         .failure();
 
@@ -137,7 +137,7 @@ fn test_init_args_incorrect_args_fail() -> eyre::Result<()> {
         .arg("--private-key")
         .arg("some_private_key")
         .arg("--auth-tokens")
-        .arg("some_auth_token")
+        .arg("some_api_key")
         .assert()
         .failure();
 

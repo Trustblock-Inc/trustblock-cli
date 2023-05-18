@@ -7,9 +7,12 @@ use publish_db::publish_audit_db;
 
 use publish_sc::publish_audit_sc;
 
-use crate::{ cmd::utils::upload_ipfs, utils::{ apply_dotenv, parse_json, validate_pdf } };
+use crate::{
+    cmd::utils::{ upload_ipfs, generate_pdf_from_url },
+    utils::{ apply_dotenv, parse_json, validate_pdf, validate_links },
+};
 
-use std::path::PathBuf;
+use std::{ path::PathBuf, println };
 
 use clap::{ Parser, ValueHint };
 
@@ -35,7 +38,19 @@ pub struct PublishAuditArgs {
         value_parser = validate_pdf,
         required(true)
     )]
-    report_pdf_file_path: PathBuf,
+    report_pdf_file_path: Option<PathBuf>,
+
+    #[clap(
+        short = 'u',
+        long = "report-url",
+        help = "Url to audit report",
+        value_name = "AUDIT_REPORT_URL",
+        value_hint = ValueHint::Url,
+        value_parser = validate_links,
+        conflicts_with = "report_pdf_file_path",
+        required(true)
+    )]
+    report_url: Option<String>,
 
     #[clap(short = 'k', long)]
     api_key: Option<String>,
@@ -61,10 +76,14 @@ impl PublishAuditArgs {
 
         let project_id = audit_data.project.clone().fetch_project_id(&api_key).await?;
 
-        let (report_hash, report_file_url) = upload_ipfs(
-            self.report_pdf_file_path,
-            &api_key
-        ).await?;
+        let report_pdf_file_path = match self.report_pdf_file_path {
+            Some(path) => path,
+            None => {
+                generate_pdf_from_url(self.report_url.expect("should not fail"), &api_key).await?
+            }
+        };
+
+        let (report_hash, report_file_url) = upload_ipfs(report_pdf_file_path, &api_key).await?;
 
         let audit_data = publish_audit_db(
             audit_data,
