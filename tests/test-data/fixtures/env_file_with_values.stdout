@@ -1,2 +1,2 @@
 WALLET_KEY=some_private_key
-AUTH_TOKEN=some_auth_token
+API_KEY=some_api_key

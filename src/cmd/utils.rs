@@ -1,7 +1,12 @@
 use crate::{
-    constants::{ TRUSTBLOCK_API_KEY_HEADER, WEB3_STORAGE_API_ENDPOINT, WEB3_STORAGE_ENDPOINT },
+    constants::{
+        TRUSTBLOCK_API_KEY_HEADER,
+        WEB3_STORAGE_API_ENDPOINT,
+        WEB3_STORAGE_ENDPOINT,
+        PDF_GENERATE_ENDPOINT,
+    },
     types::{ AuditContract, Chains, Issue, IssueCount, Severity, Status },
-    utils::apply_dotenv,
+    utils::{ apply_dotenv, validate_pdf },
 };
 
 use std::{ future::Future, path::PathBuf, sync::{ Arc, Mutex } };
@@ -11,6 +16,8 @@ use ethers::abi::{ FixedBytes, Function, Token };
 use serde::ser::{ Serialize, Serializer };
 
 use eyre::{ eyre, ContextCompat };
+
+use tempfile::NamedTempFile;
 
 use serde_json::Value;
 
@@ -30,7 +37,7 @@ pub fn block_on<F: Future>(future: F) -> F::Output {
 #[allow(clippy::future_not_send)]
 pub async fn upload_ipfs(
     report_file_path: PathBuf,
-    auth_token: &String
+    api_key: &str
 ) -> eyre::Result<(String, String)> {
     apply_dotenv()?;
 
@@ -42,7 +49,7 @@ pub async fn upload_ipfs(
 
     let response = client
         .post(web3_storage_endpoint)
-        .header(TRUSTBLOCK_API_KEY_HEADER, auth_token)
+        .header(TRUSTBLOCK_API_KEY_HEADER, api_key)
         .send().await?;
 
     if !response.status().is_success() {
@@ -59,7 +66,7 @@ pub async fn upload_ipfs(
 
     let results = helper::upload(
         report_file_path.to_str().wrap_err("Invalid File Path")?,
-        api_key.as_str(),
+        api_key,
         2,
         Some(
             Arc::new(
@@ -80,11 +87,49 @@ pub async fn upload_ipfs(
         None
     ).await?;
 
+    if report_file_path.starts_with(std::env::temp_dir()) {
+        std::fs::remove_file(report_file_path)?;
+    }
+
     let cid = results[0].to_string();
 
     let report_url = format!("https://{cid}{WEB3_STORAGE_ENDPOINT}");
 
     Ok((cid, report_url))
+}
+
+pub async fn generate_pdf_from_url(url: String, api_key: &str) -> eyre::Result<PathBuf> {
+    apply_dotenv()?;
+
+    let client = Client::new();
+
+    let temp_pdf_file = NamedTempFile::new()?;
+
+    let pdf_generate_endpoint = std::env
+        ::var("PDF_GENERATE_ENDPOINT")
+        .unwrap_or_else(|_| PDF_GENERATE_ENDPOINT.to_string());
+
+    let response = client
+        .get(pdf_generate_endpoint)
+        .header(TRUSTBLOCK_API_KEY_HEADER, api_key)
+        .query(&[("url", url)])
+        .send().await?;
+
+    if !response.status().is_success() {
+        return Err(
+            eyre!("Could not fetch web based audit report: {:#?}", response.json::<Value>().await?)
+        );
+    }
+
+    let response_bytes = response.bytes().await?;
+
+    let temp_pdf_path = temp_pdf_file.path();
+
+    std::fs::write(temp_pdf_path, response_bytes)?;
+
+    validate_pdf(temp_pdf_path.to_str().expect("should not fail"))?;
+
+    Ok(temp_pdf_file.into_temp_path().keep()?)
 }
 
 pub fn get_message_data(

@@ -17,7 +17,7 @@ pub async fn publish_audit_db(
     project_id: String,
     report_hash: String,
     report_file_url: String,
-    auth_token: &String
+    api_key: &str
 ) -> eyre::Result<Audit> {
     let client = Client::new();
 
@@ -43,7 +43,7 @@ pub async fn publish_audit_db(
 
     let response = client
         .post(audit_endpoint)
-        .header(TRUSTBLOCK_API_KEY_HEADER, auth_token)
+        .header(TRUSTBLOCK_API_KEY_HEADER, api_key)
         .json(&audit_data_send)
         .send().await?;
 

@@ -42,10 +42,21 @@ Note: Trustblock CLI can still be used without adding data to the `.env` file, a
 
 ### Audit Publishing
 
-To publish an audit, run the following command:
+To publish an audit, you can either attach pdf file or specify a web audit URL:
+
+```bash
+-r, --report-pdf <AUDIT_REPORT_PDF_FILE>
+-u, --report-url <AUDIT_REPORT_URL>
+```
+
+Example: 
 
 ```bash
 trustblock publish-audit -a audit.json -r ./Audit_Report.pdf
+```
+
+```bash
+trustblock publish-audit -a audit.json -u https://trustblock.run/my_audit
 ```
 
 You can obtain an example _audit.json_ file from https://github.com/Trustblock-Inc/trustblock-cli/blob/main/src/data/audit.json. You should fill in the fields with the appropriate information from your audit.

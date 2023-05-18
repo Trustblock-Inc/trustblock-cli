@@ -10,8 +10,6 @@ services:
       MYSQL_DATABASE: local
       MYSQL_USER: user
       MYSQL_PASSWORD: pass
-    volumes:
-      - db-data:/var/lib/mysql
     ports:
       - "3306:3306"
     healthcheck:
@@ -30,8 +28,14 @@ services:
       - "3000:3000"
     env_file:
       - .env.development.local
-    command: ["sh","./startup.sh"]
+  pdf:
+    image: tb-pdf
+    container_name: tb-pdf
+    depends_on:
+      db:
+        condition: service_healthy
+      app:
+        condition: service_started
+    ports:
+      - "3005:3005"
 
-volumes:
-  db-data:
-    name: db_volume

@@ -64,7 +64,7 @@ dependencies = ["test-exclude-ignored"]
 description = "Runs integration tests without ignored ones."
 command = "cargo"
 args = ["test"]
-dependencies = ["build","app"]
+dependencies = ["build", "app"]
 
 [tasks.app]
 description = "Starts webapp."

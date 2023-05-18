@@ -44,7 +44,7 @@ impl Project {
         }
     }
 
-    pub async fn fetch_project_id(self, auth_token: &String) -> eyre::Result<String> {
+    pub async fn fetch_project_id(self, api_key: &String) -> eyre::Result<String> {
         let client = Client::new();
 
         apply_dotenv()?;
@@ -74,7 +74,7 @@ impl Project {
 
         match projects_found {
             Value::Null => {
-                let project_id = self.create_project(auth_token, client, project_endpoint).await?;
+                let project_id = self.create_project(api_key, client, project_endpoint).await?;
 
                 Ok(project_id)
             }
@@ -90,11 +90,7 @@ impl Project {
                     .replace('\"', "");
 
                 if project_id.is_empty() {
-                    let project_id = self.create_project(
-                        auth_token,
-                        client,
-                        project_endpoint
-                    ).await?;
+                    let project_id = self.create_project(api_key, client, project_endpoint).await?;
                     return Ok(project_id);
                 }
 
@@ -107,7 +103,7 @@ impl Project {
 
     pub async fn create_project(
         self,
-        auth_token: &String,
+        api_key: &String,
         client: Client,
         project_endpoint: String
     ) -> eyre::Result<String> {
@@ -115,7 +111,7 @@ impl Project {
 
         let response = client
             .post(project_endpoint)
-            .header(TRUSTBLOCK_API_KEY_HEADER, auth_token)
+            .header(TRUSTBLOCK_API_KEY_HEADER, api_key)
             .json(&self)
             .send().await?;
 

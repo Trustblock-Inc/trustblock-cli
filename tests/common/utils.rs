@@ -1,13 +1,11 @@
 use std::{ fs::File, iter::repeat_with, path::PathBuf };
 
-use crate::common::{ constants::FONT_DIR, mock_data::MockAudit };
+use crate::common::{ constants::{ FONT_DIR, PDF_REPORTS_PATH }, mock_data::MockAudit };
 use ethers::abi::Address;
 use sqlx::{ mysql::MySqlPoolOptions, MySql, Pool };
 use strum::IntoEnumIterator;
 
 use trustblock_cli::types::{ AuditContract, Chains, IssueCount, Project, SeverityCount };
-
-use chrono::Utc;
 
 use tempfile::NamedTempFile;
 
@@ -16,9 +14,7 @@ use super::constants::AUDIT_JSON_PATH;
 pub fn generate_random_pdf() -> eyre::Result<PathBuf> {
     let default_font_name = "LiberationSans";
 
-    let pdf_file = NamedTempFile::new()?;
-
-    let current_time = Utc::now().timestamp().to_string();
+    let pdf_file = NamedTempFile::new_in(PDF_REPORTS_PATH)?;
 
     let random_string: String = repeat_with(fastrand::alphanumeric).take(10).collect();
 
@@ -30,7 +26,7 @@ pub fn generate_random_pdf() -> eyre::Result<PathBuf> {
 
     let mut doc = genpdf::Document::new(default_font);
     // Change the default settings
-    doc.set_title(format!("Audit Report - {}", current_time));
+    doc.set_title("Audit Report");
     // Customize the pages
     let mut decorator = genpdf::SimplePageDecorator::new();
     decorator.set_margins(10);
@@ -50,7 +46,7 @@ pub fn generate_random_pdf() -> eyre::Result<PathBuf> {
     Ok(pdf_file)
 }
 
-pub fn generate_random_audit() -> eyre::Result<(PathBuf, MockAudit)> {
+pub fn generate_random_audit(project_seed: Option<u64>) -> eyre::Result<(PathBuf, MockAudit)> {
     let file = File::open(AUDIT_JSON_PATH)?;
     let default_audit = serde_json::from_reader::<File, MockAudit>(file)?;
 
@@ -80,7 +76,7 @@ pub fn generate_random_audit() -> eyre::Result<(PathBuf, MockAudit)> {
         .take(5)
         .collect::<Vec<AuditContract>>();
 
-    let project = generate_random_project()?;
+    let project = generate_random_project(project_seed)?;
 
     let audit_struct = MockAudit {
         project,
@@ -102,7 +98,11 @@ pub fn generate_random_audit() -> eyre::Result<(PathBuf, MockAudit)> {
     Ok((audit_file, audit_struct))
 }
 
-pub fn generate_random_project() -> eyre::Result<Project> {
+pub fn generate_random_project(seed: Option<u64>) -> eyre::Result<Project> {
+    if let Some(seed) = seed {
+        fastrand::seed(seed);
+    }
+
     let name: String = repeat_with(fastrand::alphanumeric).take(10).collect();
 
     let twitter = format!("https://twitter.com/{name}");

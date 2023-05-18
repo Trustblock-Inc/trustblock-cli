@@ -38,7 +38,7 @@ pub async fn publish_audit_sc(
     project_name: &str,
     report_hash: String,
     private_key: Option<String>,
-    auth_token: &String
+    api_key: &str
 ) -> eyre::Result<()> {
     apply_dotenv()?;
 
@@ -131,7 +131,7 @@ pub async fn publish_audit_sc(
 
         let response = reqwest_client
             .post(forwarder_endpoint)
-            .header(TRUSTBLOCK_API_KEY_HEADER, auth_token)
+            .header(TRUSTBLOCK_API_KEY_HEADER, api_key)
             .json(&webhook_request)
             .send().await?;
 
