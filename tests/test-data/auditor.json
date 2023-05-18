@@ -1,0 +1,14 @@
+{
+  "name": "Timur Org",
+  "evmAddress": "0x93da76CFc683E1536C91d37abcfE17a60c29B578",
+  "contact": {
+    "email": "timur@trustblock.run"
+  },
+  "links": {
+    "website": "https://trustblock.run",
+    "twitter": "https://twitter.com/trustblockhq"
+  },
+  "description": {
+    "summary": "Super cool org"
+  }
+}

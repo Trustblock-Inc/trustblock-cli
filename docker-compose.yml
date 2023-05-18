@@ -1,0 +1,37 @@
+version: "3.9"
+services:
+  db:
+    image: mysql:latest
+    container_name: tb-db
+    restart: always
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: true
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: local
+      MYSQL_USER: user
+      MYSQL_PASSWORD: pass
+    volumes:
+      - db-data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: mysqladmin ping -h 127.0.0.1 -u $$MYSQL_USER --password=$$MYSQL_PASSWORD
+      interval: 3s
+      timeout: 20s
+      retries: 30
+
+  app:
+    image: tb-webapp
+    container_name: tb-webapp
+    depends_on:
+      db:
+       condition: service_healthy
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env.development.local
+    command: ["sh","./startup.sh"]
+
+volumes:
+  db-data:
+    name: db_volume

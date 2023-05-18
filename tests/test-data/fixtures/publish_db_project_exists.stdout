@@ -1,0 +1,8 @@
+Publishing an audit
+
+(?:\[\+\] Uploading .+\. Finished %\d+
+)+\[\+\] Uploading is done
+
+Audit published successfully to DB!
+
+Audit published successfully

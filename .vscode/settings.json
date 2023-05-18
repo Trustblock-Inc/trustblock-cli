@@ -1,0 +1,9 @@
+{
+  "rust-analyzer.check.command": "clippy",
+  "[rust]": {
+    "editor.defaultFormatter": "jinxdash.prettier-rust"
+  },
+  "rust-analyzer.linkedProjects": [
+    "./Cargo.toml"
+  ]
+}

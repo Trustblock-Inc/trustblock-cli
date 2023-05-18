@@ -1,0 +1,9 @@
+Publishing an audit
+Project not found, creating new project\.{3}
+
+(?:\[\+\] Uploading .+\. Finished %\d+
+)+\[\+\] Uploading is done
+
+Audit already published to DB!
+
+Audit published successfully

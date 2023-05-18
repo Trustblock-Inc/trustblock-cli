@@ -1,0 +1,78 @@
+[package]
+name = "trustblock-cli"
+version = "0.5.8"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+authors = [
+    "Timur Guvenkaya <timur@trustblock.run>",
+    "Trustblock <contact@trustblock.run>",
+]
+readme = "README.md"
+documentation = "https://docs.trustblock.run/technical-documentation/publish-an-audit#using-our-cli"
+homepage = "https://trustblock.run"
+repository = "https://github.com/Trustblock-Inc/trustblock-cli"
+description = "human-friendly console utility that helps to interact with Trustblock from command line."
+keywords = ["web3", "cli", "trustblock"]
+
+
+[profile.dev]
+# Disabling debug info speeds up builds a bunch,
+# and we don't rely on it for debugging that much
+debug = 0
+
+[[bin]]
+name = "trustblock"
+path = "src/main.rs"
+
+[profile.release]
+codegen-units = 1
+# Tell `rustc` to optimize for small code size.
+opt-level = "z"
+lto = true
+debug = false
+panic = "abort"
+overflow-checks = true
+
+
+[registries.crates-io]
+protocol = "sparse"
+
+[dev-dependencies]
+assert_cmd = "2.0.11"
+fastrand = "1.9.0"
+genpdf = "0.2.0"
+predicates = "3.0.3"
+sqlx = { version = "0.7.0-alpha.2", features = [ "runtime-tokio" , "macros", "mysql"] }
+rusty-hook = "0.11.2"
+serial_test = "2.0.0"
+tempfile = "3.5.0"
+regex = "1.8.1"
+
+
+
+[dependencies]
+cargo_toml = "0.15.2"
+chrono = "0.4.24"
+clap = { version = "4.1.6", features = ["derive", "unstable-doc"] }
+color-eyre = "0.6"
+dirs = "5.0.0"
+dotenv = "0.15.0"
+ethers = { version = "2.0.1", features = ["eip712"] }
+ethers-core = { version = "2.0.1", features = ["eip712"] }
+eyre = "0.6.8"
+futures = "0.3"
+futures-util = { version = "0.3.17", default-features = false, features = [
+    "std",
+] }
+indicatif = "0.17.3"
+itertools = "0.10.5"
+pdf = "0.8.1"
+reqwest = { version = "0.11.14", features = ["json"] }
+serde = { version = "1.0.152", features = ["derive"] }
+serde_json = "1.0.91"
+serde_with = "2.2.0"
+strum = "0.24.1"
+tokio = { version = "1.25.0", features = ["macros"] }
+validator = { version = "0.16.0", features = ["derive"] }
+w3s = { version = "0.2.10", features = ["all"] }
+yansi = "0.5"

@@ -1,0 +1,50 @@
+{
+  "project": {
+    "name": "Trustblock",
+    "links": {
+      "website": "https://trustblock.run",
+      "twitter": "https://twitter.com"
+    },
+    "contact": {
+      "email": "contact@trustblock.run"
+    }
+  },
+  "audit": {
+    "issues": {
+      "FIXED": {
+        "LOW": 0,
+        "MEDIUM": 0,
+        "HIGH": 0,
+        "CRITICAL": 0
+      },
+      "RISK_ACCEPTED": {
+        "LOW": 0,
+        "MEDIUM": 0,
+        "HIGH": 0,
+        "CRITICAL": 0
+      }
+    },
+    "tags": [
+      "COLLECTIBLES",
+      "TOKEN"
+    ],
+    "contracts": [
+      {
+        "evmAddress": "0x9ADA35eB158f83FCd65949bb1D0D928e473001f1",
+        "chain": "ETHEREUM"
+      },
+      {
+        "evmAddress": "0x9ADA35eB158f83FCd65949bb1D0D928e473001f2",
+        "chain": "POLYGON"
+      },
+      {
+        "evmAddress": "0x9ADA35eB158f83FCd65949bb1D0D928e473001f3",
+        "chain": "POLYGON"
+      }
+    ],
+    "description": {
+      "summary": "**The audit was performed on the TimSwap ERC20 contract**.\n The contract is a standard ERC20 token with a few additional functions. The contract is deployed on Ethereum and Polygon networks.\n"
+    },
+    "name": "TimSwap ERC20 audit"
+  }
+}
