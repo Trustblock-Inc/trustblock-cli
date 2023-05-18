@@ -1,8 +1,8 @@
 #!/bin/bash
 
-add_db() {
-    source .env
+source .env
 
+add_db() {
     trustblock-internal add-user-db -d ./tests/test-data/auditor.json -e http://localhost:3000/api/user/auditor -m $MASTER_KEY
 
     API_KEY=$(mysql -h127.0.0.1 -uuser -ppass local -Bse "SELECT \`key\` FROM ApiKey;")
