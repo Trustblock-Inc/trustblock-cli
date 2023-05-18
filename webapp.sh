@@ -19,7 +19,7 @@ add_db() {
 }
 
 if [ -z "$(docker ps -f "name=app" -f "status=running" -q)" ]; then
-    docker compose up -d
+    docker-compose up -d
 
     # Loop until the app is ready or we've tried 10 times
     for i in {1..10}; do
@@ -36,6 +36,6 @@ if [ -z "$(docker ps -f "name=app" -f "status=running" -q)" ]; then
     done
 
 else
-    docker compose exec app npx prisma migrate reset -f --skip-generate &&
-        docker compose exec app npx prisma db push --skip-generate && add_db
+    docker-compose compose exec app npx prisma migrate reset -f --skip-generate &&
+        docker-compose compose exec app npx prisma db push --skip-generate && add_db
 fi
