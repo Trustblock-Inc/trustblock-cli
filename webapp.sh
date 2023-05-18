@@ -37,7 +37,5 @@ if [ -z "$(docker ps -f "name=app" -f "status=running" -q)" ]; then
 
 else
     docker compose exec app npx prisma migrate reset -f --skip-generate &&
-        docker compose exec app npx prisma db push --skip-generate
-
-    add_db
+        docker compose exec app npx prisma db push --skip-generate && add_db
 fi
