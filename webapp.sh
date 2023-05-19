@@ -7,15 +7,15 @@ add_db() {
 
     API_KEY=$(mysql -h127.0.0.1 -uuser -ppass local -Bse "SELECT \`key\` FROM ApiKey;")
 
-    trustblock clean && trustblock init -p $WALLET_KEY -a $API_KEY
+    # CLI env path
+    CLI_FOLDER="$HOME/.trustblock"
 
-    content_to_append="\nAUDIT_ENDPOINT=$AUDIT_ENDPOINT\nPROJECT_ENDPOINT=$PROJECT_ENDPOINT\nFORWARDER_ENDPOINT=$FORWARDER_ENDPOINT\nWEB3_STORAGE_API_ENDPOINT=$WEB3_STORAGE_API_ENDPOINT\nTB_CORE_ADDRESS=$TB_CORE_ADDRESS\nPDF_GENERATE_ENDPOINT=$PDF_GENERATE_ENDPOINT"
+    rm -rf $CLI_FOLDER && mkdir $CLI_FOLDER
 
-    # The file you want to append to
-    file_path="$HOME/.trustblock/.env"
+    content_to_append="\nWALLET_KEY=$WALLET_KEY\nAPI_KEY=$API_KEY\nAUDIT_ENDPOINT=$AUDIT_ENDPOINT\nPROJECT_ENDPOINT=$PROJECT_ENDPOINT\nFORWARDER_ENDPOINT=$FORWARDER_ENDPOINT\nWEB3_STORAGE_API_ENDPOINT=$WEB3_STORAGE_API_ENDPOINT\nTB_CORE_ADDRESS=$TB_CORE_ADDRESS\nPDF_GENERATE_ENDPOINT=$PDF_GENERATE_ENDPOINT"
 
-    # Append the content to the file
-    echo -e "$content_to_append" >>"$file_path"
+    # Append the content to the .env file
+    echo -e "$content_to_append" >>"$CLI_FOLDER/.env"
 }
 
 if [ -z "$(docker ps -f "name=app" -f "status=running" -q)" ]; then
