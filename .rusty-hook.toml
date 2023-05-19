@@ -1,8 +1,0 @@
-[hooks]
-pre-commit = "cargo make format && cargo make lint"
-pre-push = "cargo make format-check"
-# Disabling make test for now. For some reason it does not work through rusty hook
-#pre-push = "cargo make format-check && cargo make test
-
-[logging]
-verbose = true
