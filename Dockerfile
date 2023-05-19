@@ -33,13 +33,6 @@ RUN useradd -ms /bin/bash trustblock
 # copy the build artifact from the build stage
 COPY --chown=trustblock:trustblock --from=builder /trustblock-cli/target/release/trustblock .
 
-ENV AUDIT_FOLDER=/home/trustblock/audit-files
-ENV REPORT_FOLDER=/home/trustblock/audit-reports
-
-RUN  mkdir $AUDIT_FOLDER && chown -R trustblock:trustblock $AUDIT_FOLDER
-
-RUN  mkdir $REPORT_FOLDER && chown -R trustblock:trustblock $REPORT_FOLDER
-
 USER trustblock
 
 # set the entrypoint
