@@ -28,8 +28,6 @@ FROM rust:1.69-slim-buster
 
 RUN useradd -ms /bin/bash trustblock
 
-# Folders where you keep audit JSON files and Report PDFs. Those can be the same
-
 # copy the build artifact from the build stage
 COPY --chown=trustblock:trustblock --from=builder /trustblock-cli/target/release/trustblock .
 
