@@ -4,7 +4,7 @@ use crate::{
         WEB3_STORAGE_API_ENDPOINT,
         WEB3_STORAGE_ENDPOINT,
         PDF_GENERATE_ENDPOINT,
-        GITHUB_API_LATEST_RELEASE_ENDPOINT,
+        CRATES_API_RELEASE_ENDPOINT,
         GITHUB_LATEST_RELEASE,
     },
     types::{ AuditContract, Chains, Issue, IssueCount, Severity, Status },
@@ -23,7 +23,7 @@ use tempfile::NamedTempFile;
 
 use serde_json::Value;
 
-use reqwest::{ Client, header::{ HeaderMap, HeaderValue, self } };
+use reqwest::{ Client, header::{ HeaderValue, self } };
 
 use w3s::helper;
 
@@ -197,28 +197,20 @@ pub async fn check_update() -> eyre::Result<()> {
 
     let local_version = clap::crate_version!();
 
-    let mut headers = HeaderMap::new();
-
-    headers.insert("X-GitHub-Api-Version", HeaderValue::from_str("2022-11-28")?);
-
-    headers.insert(header::ACCEPT, HeaderValue::from_str("application/vnd.github+json")?);
-    headers.insert(
-        header::USER_AGENT,
-        HeaderValue::from_str(
-            "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:15.0) Gecko/20100101 Firefox/15.0.1"
-        )?
-    );
-
-    let response = client.get(GITHUB_API_LATEST_RELEASE_ENDPOINT).headers(headers).send().await?;
+    let response = client
+        .get(CRATES_API_RELEASE_ENDPOINT)
+        .header(
+            header::USER_AGENT,
+            HeaderValue::from_str(
+                "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:15.0) Gecko/20100101 Firefox/15.0.1"
+            )?
+        )
+        .send().await?;
 
     if response.status().is_success() {
         let json_response = response.json::<Value>().await?;
 
-        let version = &json_response["tag_name"]
-            .as_str()
-            .unwrap_or_default()
-            .strip_prefix('v')
-            .unwrap_or_default();
+        let version = &json_response["crate"]["newest_version"].as_str().unwrap_or_default();
 
         if version != &local_version {
             println!(
