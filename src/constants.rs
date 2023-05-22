@@ -20,8 +20,7 @@ pub const WEB3_STORAGE_API_ENDPOINT: &str = "https://beta.trustblock.run/api/fil
 
 pub const PDF_GENERATE_ENDPOINT: &str = "https://trustblock-pdf-production.up.railway.app/pdf";
 
-pub const GITHUB_API_LATEST_RELEASE_ENDPOINT: &str =
-    "https://api.github.com/repos/Trustblock-Inc/trustblock-cli/releases/latest";
+pub const CRATES_API_RELEASE_ENDPOINT: &str = "https://crates.io/api/v1/crates/trustblock-cli";
 
 pub const GITHUB_LATEST_RELEASE: &str =
     "https://github.com/Trustblock-Inc/trustblock-cli/releases/latest";
