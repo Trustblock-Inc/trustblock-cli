@@ -44,7 +44,7 @@ args = ["clean"]
 [tasks.build]
 description = "Compile the source code."
 command = "cargo"
-args = ["build"]
+args = ["build", "--all"]
 dependencies = ["lint"]
 
 [tasks.run]
