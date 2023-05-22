@@ -7,12 +7,17 @@ Refer to the [Trustblock CLI documentation](https://docs.trustblock.run/technica
 Installation
 ------------
 
-Install Trustblock CLI using Cargo:
+If you have cargo installed, you can install our CLI via:
 
 ```bash
 cargo install trustblock-cli
 ```
 
+For other installation methods please refer to: 
+
+```bash
+https://github.com/Trustblock-Inc/trustblock-cli/releases
+```
 Usage
 -----
 
