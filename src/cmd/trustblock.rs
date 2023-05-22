@@ -5,7 +5,7 @@ use clap::{ command, Parser, Subcommand };
 use std::str;
 
 #[derive(Debug, Parser)]
-#[command(about = "Trustblock CLI")]
+#[command(about = "Trustblock CLI", version)]
 pub struct Cli {
     #[command(subcommand)]
     pub command: Commands,
