@@ -1,7 +1,7 @@
 use clap::Parser;
 
 use trustblock_cli::{
-    cmd::{ block_on, trustblock::{ Cli, Commands }, Cmd },
+    cmd::{ block_on, trustblock::{ Cli, Commands }, Cmd, check_update },
     constants::CLI_PATH,
     error_handler,
 };
@@ -9,6 +9,8 @@ use trustblock_cli::{
 fn main() -> eyre::Result<()> {
     error_handler::install()?;
     let cli = Cli::parse();
+
+    block_on(check_update())?;
 
     match cli.command {
         Commands::PublishAudit(cmd) => {
@@ -29,16 +31,13 @@ fn main() -> eyre::Result<()> {
     }
 }
 
-#[test]
-fn verify_cli() {
-    use clap::CommandFactory;
-
-    Cli::command().debug_assert();
-}
-
 #[cfg(test)]
 mod tests {
-    // use super::*;
     #[test]
-    fn test() {}
+    fn verify_cli() {
+        use clap::CommandFactory;
+        use super::*;
+
+        Cli::command().debug_assert();
+    }
 }

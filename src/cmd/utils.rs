@@ -4,6 +4,8 @@ use crate::{
         WEB3_STORAGE_API_ENDPOINT,
         WEB3_STORAGE_ENDPOINT,
         PDF_GENERATE_ENDPOINT,
+        GITHUB_API_LATEST_RELEASE_ENDPOINT,
+        GITHUB_LATEST_RELEASE,
     },
     types::{ AuditContract, Chains, Issue, IssueCount, Severity, Status },
     utils::{ apply_dotenv, validate_pdf },
@@ -21,7 +23,7 @@ use tempfile::NamedTempFile;
 
 use serde_json::Value;
 
-use reqwest::Client;
+use reqwest::{ Client, header::{ HeaderMap, HeaderValue, self } };
 
 use w3s::helper;
 
@@ -188,6 +190,44 @@ pub fn get_transformed_issues(issues: &IssueCount) -> Vec<Issue> {
     }
 
     result
+}
+
+pub async fn check_update() -> eyre::Result<()> {
+    let client = Client::new();
+
+    let local_version = clap::crate_version!();
+
+    let mut headers = HeaderMap::new();
+
+    headers.insert("X-GitHub-Api-Version", HeaderValue::from_str("2022-11-28")?);
+
+    headers.insert(header::ACCEPT, HeaderValue::from_str("application/vnd.github+json")?);
+    headers.insert(
+        header::USER_AGENT,
+        HeaderValue::from_str(
+            "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:15.0) Gecko/20100101 Firefox/15.0.1"
+        )?
+    );
+
+    let response = client.get(GITHUB_API_LATEST_RELEASE_ENDPOINT).headers(headers).send().await?;
+
+    if response.status().is_success() {
+        let json_response = response.json::<Value>().await?;
+
+        let version = &json_response["tag_name"]
+            .as_str()
+            .unwrap_or_default()
+            .strip_prefix('v')
+            .unwrap_or_default();
+
+        if version != &local_version {
+            println!(
+                "New version of Trustblock CLI is available: {version}.\nPlease download a new version from: {GITHUB_LATEST_RELEASE}\n\n"
+            );
+        }
+    }
+
+    Ok(())
 }
 
 #[must_use]
