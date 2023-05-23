@@ -74,7 +74,7 @@ impl PublishAuditArgs {
             None => std::env::var("API_KEY")?,
         };
 
-        let project_id = audit_data.project.clone().fetch_project_id().await?;
+        let project_id = audit_data.project.clone().fetch_project_id(&api_key).await?;
 
         let report_pdf_file_path = match self.report_pdf_file_path {
             Some(path) => path,

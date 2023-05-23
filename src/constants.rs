@@ -12,7 +12,7 @@ pub const FUJI_RPC_URL: &str =
 
 pub const AUDIT_ENDPOINT: &str = "https://beta.trustblock.run/api/audit/";
 
-pub const PROJECT_ENDPOINT: &str = "https://beta.trustblock.run/api/project/";
+pub const PROJECT_DOMAIN_ENDPOINT: &str = "https://beta.trustblock.run/api/project/domain/";
 
 pub const FORWARDER_ENDPOINT: &str = "https://beta.trustblock.run/api/audit/forwarder/";
 
