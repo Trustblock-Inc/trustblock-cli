@@ -1,6 +1,6 @@
 use crate::{
     constants::{ AUDIT_ENDPOINT, TRUSTBLOCK_API_KEY_HEADER },
-    types::{ Audit, Chains },
+    types::{ Audit, Chains, Project },
     utils::apply_dotenv,
 };
 
@@ -14,7 +14,7 @@ use eyre::eyre;
 
 pub async fn publish_audit_db(
     audit_data: Audit,
-    project_id: String,
+    project_id: Option<String>,
     report_hash: String,
     report_file_url: String,
     api_key: &str
@@ -33,12 +33,17 @@ pub async fn publish_audit_db(
         .unique()
         .collect::<Vec<Chains>>();
 
+    let project = Project {
+        id: project_id,
+        ..audit_data.clone().project
+    };
+
     let audit_data_send = Audit {
         chains,
         report_hash: report_hash.clone(),
         report_file_url,
-        project_id,
-        ..audit_data.clone()
+        project,
+        ..audit_data
     };
 
     let response = client

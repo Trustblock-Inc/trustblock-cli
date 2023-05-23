@@ -18,8 +18,6 @@ pub struct MockAudit {
     #[serde(rename = "reportFileUrl", skip_deserializing)]
     pub report_file_url: String,
     pub project: Project,
-    #[serde(skip_deserializing, rename = "projectId")]
-    pub project_id: String,
 }
 
 #[derive(Debug, sqlx::FromRow)]
