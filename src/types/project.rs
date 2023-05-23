@@ -1,12 +1,8 @@
-use crate::{
-    constants::{ PROJECT_ENDPOINT, TRUSTBLOCK_API_KEY_HEADER },
-    types::{ Contact, Links },
-    utils::apply_dotenv,
-};
+use crate::{ constants::{ PROJECT_ENDPOINT }, types::{ Contact, Links }, utils::apply_dotenv };
 
 use serde::{ Deserialize, Serialize };
 
-use reqwest::{ Client, StatusCode };
+use reqwest::{ Client };
 
 use validator::Validate;
 
@@ -22,6 +18,8 @@ pub struct Project {
     pub links: Links,
     #[validate]
     pub contact: Contact,
+    #[serde(skip_deserializing, skip_serializing_if = "Option::is_none")]
+    pub id: Option<String>,
 }
 
 impl Project {
@@ -31,7 +29,8 @@ impl Project {
         twitter: Option<String>,
         github: Option<String>,
         website: Option<String>,
-        email: Option<String>
+        email: Option<String>,
+        id: Option<String>
     ) -> Self {
         Self {
             name,
@@ -41,10 +40,11 @@ impl Project {
                 website,
             },
             contact: Contact { email },
+            id,
         }
     }
 
-    pub async fn fetch_project_id(self, api_key: &String) -> eyre::Result<String> {
+    pub async fn fetch_project_id(self) -> eyre::Result<Option<String>> {
         let client = Client::new();
 
         apply_dotenv()?;
@@ -73,11 +73,7 @@ impl Project {
         let projects_found = &project_response_data["projectsFound"];
 
         match projects_found {
-            Value::Null => {
-                let project_id = self.create_project(api_key, client, project_endpoint).await?;
-
-                Ok(project_id)
-            }
+            Value::Null => { Ok(None) }
 
             Value::Array(val) => {
                 let project_id = val
@@ -90,50 +86,13 @@ impl Project {
                     .replace('\"', "");
 
                 if project_id.is_empty() {
-                    let project_id = self.create_project(api_key, client, project_endpoint).await?;
-                    return Ok(project_id);
+                    return Ok(None);
                 }
 
-                Ok(project_id)
+                Ok(Some(project_id))
             }
 
-            _ => Err(eyre!("Error occured while fetching a project")),
-        }
-    }
-
-    pub async fn create_project(
-        self,
-        api_key: &String,
-        client: Client,
-        project_endpoint: String
-    ) -> eyre::Result<String> {
-        println!("Project not found, creating new project...\n");
-
-        let response = client
-            .post(project_endpoint)
-            .header(TRUSTBLOCK_API_KEY_HEADER, api_key)
-            .json(&self)
-            .send().await?;
-
-        match response.status() {
-            StatusCode::UNAUTHORIZED => Err(eyre!("Unauthorized, please check your auth token.")),
-
-            StatusCode::CREATED => {
-                let project_response_data = response.json::<Value>().await?;
-
-                let project_id = project_response_data["id"].to_string().trim().replace('\"', "");
-
-                Ok(project_id)
-            }
-
-            _ =>
-                Err(
-                    eyre!(
-                        "Could not create project. Response: {:?}\n Response Text: {:?}",
-                        response.status(),
-                        response.json::<Value>().await?
-                    )
-                ),
+            _ => Err(eyre!("Error occurred while fetching a project")),
         }
     }
 }

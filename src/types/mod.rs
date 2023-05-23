@@ -144,10 +144,7 @@ pub struct Audit {
     #[validate(url)]
     #[serde(rename = "reportFileUrl", skip_deserializing)]
     pub report_file_url: String,
-    #[serde(skip_serializing)]
     pub project: Project,
-    #[serde(skip_deserializing, rename = "projectId")]
-    pub project_id: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]

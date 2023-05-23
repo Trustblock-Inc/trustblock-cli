@@ -14,7 +14,7 @@ fn main() -> eyre::Result<()> {
 
     match cli.command {
         Commands::PublishAudit(cmd) => {
-            println!("Publishing an audit");
+            println!("Publishing an audit\n");
             block_on(cmd.run())?;
             Ok(())
         }

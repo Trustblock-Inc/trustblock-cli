@@ -87,8 +87,6 @@ pub fn generate_random_audit(project_seed: Option<u64>) -> eyre::Result<(PathBuf
         ..default_audit
     };
 
-    println!("AUDIT: {audit_struct:#?}");
-
     let audit_file = NamedTempFile::new()?;
 
     serde_json::to_writer(&audit_file, &audit_struct)?;
@@ -113,7 +111,7 @@ pub fn generate_random_project(seed: Option<u64>) -> eyre::Result<Project> {
 
     let email = format!("{name}@mail.com");
 
-    let project = Project::new(name, Some(twitter), Some(github), Some(website), Some(email));
+    let project = Project::new(name, Some(twitter), Some(github), Some(website), Some(email), None);
 
     Ok(project)
 }
