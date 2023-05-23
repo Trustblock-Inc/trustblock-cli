@@ -58,10 +58,18 @@ pub async fn publish_audit_db(
 
     match status {
         StatusCode::BAD_REQUEST => {
-            if body["error"] == "Report hash is not a unique value." {
+            let error = &body["error"];
+
+            if error == "Report hash is not a unique value." {
                 println!("Audit already published to DB!\n");
                 return Ok(audit_data_send);
             }
+
+            if error == "Project domain is not a unique value." {
+                println!("Project already exists on DB!\n");
+                return Ok(audit_data_send);
+            }
+
             Err(eyre!("Could not publish to DB. Check validity of the audit data: {body} "))
         }
         StatusCode::CREATED => {
