@@ -99,6 +99,8 @@ async fn test_publish_audit_db() -> eyre::Result<()> {
         .success()
         .stdout(predicate::str::is_match(pattern)?);
 
+    /******* PROJECT CHECK *******/
+
     let fetched_project_names = sqlx
         ::query("SELECT name FROM Project WHERE name = ?")
         .bind(&audit.project.name)
@@ -126,6 +128,37 @@ async fn test_publish_audit_db() -> eyre::Result<()> {
 
     assert!(project_links == fetched_links[0], "Project links do not equal queried project links");
 
+    let project_links: Links = web_audit.project.links;
+
+    let fetched_project_names = sqlx
+        ::query("SELECT name FROM Project WHERE name = ?")
+        .bind(&web_audit.project.name)
+        .fetch_all(&pool).await?;
+
+    assert!(fetched_project_names.len() == 1, "Only one project should be added");
+
+    let fetched_project_name = fetched_project_names[0].get::<String, _>("name");
+
+    assert!(
+        web_audit.project.name == fetched_project_name,
+        "Project name does not equal queried project name"
+    );
+
+    // prettier-ignore
+    let fetched_links = sqlx
+        ::query_as!(
+            Links,
+            "SELECT website, twitter, github FROM Links WHERE website = ?",
+            project_links.website.as_ref().unwrap()
+        )
+        .fetch_all(&pool).await?;
+
+    assert!(fetched_links.len() == 1, "Only one link row should be added");
+
+    assert!(project_links == fetched_links[0], "Project links do not equal queried project links");
+
+    /******* AUDIT CHECK *******/
+
     let fetched_audit_data = sqlx
         ::query("SELECT id, name FROM Audit WHERE name = ?")
         .bind(&audit.name)
@@ -151,6 +184,8 @@ async fn test_publish_audit_db() -> eyre::Result<()> {
         web_audit.name == fetched_audit_name_web,
         "Web Audit name does not equal queried Web Audit name"
     );
+
+    /******* CONTRACT CHECK *******/
 
     let fetched_contract_data = sqlx
         ::query("SELECT id, evmAddress, chain FROM Contract")
@@ -211,6 +246,8 @@ async fn test_publish_audit_db() -> eyre::Result<()> {
         .all(|contract_id| fetched_contract_ids.contains(&contract_id.get::<String, _>("B")));
 
     assert!(is_mapping_exists, "Missing mapping between audit to contract");
+
+    /******* ISSUE CHECK *******/
 
     let fetched_audit_id = fetched_audit_data[0].get::<String, _>("id");
 
