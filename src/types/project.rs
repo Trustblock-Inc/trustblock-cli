@@ -1,12 +1,12 @@
 use crate::{
-    constants::{ PROJECT_DOMAIN_ENDPOINT, TRUSTBLOCK_API_KEY_HEADER },
+    constants::{ PROJECT_SLUG_ENDPOINT, TRUSTBLOCK_API_KEY_HEADER },
     types::{ Contact, Links },
     utils::apply_dotenv,
 };
 
 use serde::{ Deserialize, Serialize };
 
-use reqwest::{ Client, Url, StatusCode };
+use reqwest::{ Client, StatusCode, Url };
 
 use validator::Validate;
 
@@ -55,13 +55,14 @@ impl Project {
 
         apply_dotenv()?;
 
-        let project_domain_endpoint = std::env
-            ::var("PROJECT_DOMAIN_ENDPOINT")
-            .unwrap_or_else(|_| PROJECT_DOMAIN_ENDPOINT.to_string());
+        let project_slug_endpoint = std::env
+            ::var("PROJECT_SLUG_ENDPOINT")
+            .unwrap_or_else(|_| PROJECT_SLUG_ENDPOINT.to_string());
+
+        let slug = url.domain().unwrap_or_default().replace('.', "-");
 
         let response = client
-            .get(&project_domain_endpoint)
-            .query(&[("query", url.domain().unwrap_or_default())])
+            .get(&format!("{project_slug_endpoint}{slug}"))
             .header(TRUSTBLOCK_API_KEY_HEADER, api_key)
             .send().await?;
 
