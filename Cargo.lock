@@ -5536,7 +5536,7 @@ dependencies = [
 
 [[package]]
 name = "trustblock-cli"
-version = "0.8.1"
+version = "0.8.5"
 dependencies = [
  "assert_cmd",
  "cargo_toml",
