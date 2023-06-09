@@ -1,7 +1,7 @@
 use std::{ fs::File, iter::repeat_with, path::PathBuf };
 
 use crate::common::{ constants::{ FONT_DIR, PDF_REPORTS_PATH }, mock_data::MockAudit };
-use ethers::abi::Address;
+use ethers_core::types::Address;
 use sqlx::{ mysql::MySqlPoolOptions, MySql, Pool };
 use strum::IntoEnumIterator;
 

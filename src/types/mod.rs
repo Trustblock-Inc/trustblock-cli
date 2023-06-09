@@ -1,19 +1,12 @@
-mod chains;
-mod forward_request;
 mod project;
-mod trustblock_contracts;
-
-pub use trustblock_contracts::TrustblockForwarder;
-
-pub use forward_request::ForwardRequest;
 
 pub use project::Project;
 
-pub use chains::Chains;
-
-use ethers::{ abi::Address, types::Bytes };
+use ethers_core::types::Address;
 
 use serde::{ Deserialize, Serialize };
+
+use strum::{ EnumIter, EnumString };
 
 use crate::cmd::serialize_issues;
 
@@ -23,7 +16,30 @@ use std::convert::From;
 
 use clap::ValueEnum;
 
-use strum::EnumIter;
+#[derive(
+    Clone,
+    Copy,
+    Debug,
+    Deserialize,
+    EnumIter,
+    Hash,
+    Eq,
+    PartialEq,
+    Serialize,
+    Default,
+    PartialOrd,
+    Ord,
+    EnumString
+)]
+#[serde(rename_all = "UPPERCASE")]
+#[strum(serialize_all = "UPPERCASE")]
+pub enum Chains {
+    #[default]
+    Ethereum,
+    Polygon,
+    BnbChain,
+    Avalanche,
+}
 
 #[derive(Clone, Copy, Debug, Deserialize, EnumIter, ValueEnum, Hash, Eq, PartialEq, Serialize)]
 #[serde(rename_all = "UPPERCASE")]
@@ -108,19 +124,6 @@ impl Issue {
     pub const fn new(status: Status, severity: Severity) -> Self {
         Self { status, severity }
     }
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct WebhookRequest {
-    pub request: ForwardRequest,
-    #[serde(rename = "domainSeparator")]
-    pub domain_separator: Bytes,
-    #[serde(rename = "requestTypeHash")]
-    pub request_type_hash: Bytes,
-    #[serde(rename = "suffixData")]
-    pub suffix_data: Bytes,
-    pub signature: Bytes,
-    pub chain: String,
 }
 
 #[derive(Debug, Clone, Validate, Serialize, Deserialize)]

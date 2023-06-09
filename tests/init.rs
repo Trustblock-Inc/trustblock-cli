@@ -86,8 +86,6 @@ fn test_init_args_success() -> eyre::Result<()> {
 
     Command::cargo_bin("trustblock")?
         .arg("init")
-        .arg("-p")
-        .arg("some_private_key")
         .arg("-a")
         .arg("some_api_key")
         .assert()

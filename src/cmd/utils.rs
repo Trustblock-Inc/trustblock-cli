@@ -7,13 +7,13 @@ use crate::{
         CRATES_API_RELEASE_ENDPOINT,
         GITHUB_LATEST_RELEASE,
     },
-    types::{ AuditContract, Chains, Issue, IssueCount, Severity, Status },
+    types::{ Issue, IssueCount, Severity, Status },
     utils::{ apply_dotenv, validate_pdf },
 };
 
 use std::{ future::Future, path::PathBuf, sync::{ Arc, Mutex } };
 
-use ethers::abi::{ FixedBytes, Function, Token };
+use reqwest::{ Client, header::{ HeaderValue, self } };
 
 use serde::ser::{ Serialize, Serializer };
 
@@ -22,8 +22,6 @@ use eyre::{ eyre, ContextCompat };
 use tempfile::NamedTempFile;
 
 use serde_json::Value;
-
-use reqwest::{ Client, header::{ HeaderValue, self } };
 
 use w3s::helper;
 
@@ -134,34 +132,6 @@ pub async fn generate_pdf_from_url(url: String, api_key: &str) -> eyre::Result<P
     Ok(temp_pdf_file.into_temp_path().keep()?)
 }
 
-pub fn get_message_data(
-    publish_audit_function: &Function,
-    chain: &Chains,
-    contracts: &[AuditContract],
-    project_name: [u8; 28],
-    report_hash: String,
-    issue_bytes: [u8; 4]
-) -> eyre::Result<Vec<u8>> {
-    let contract_tokens = contracts
-        .iter()
-        .filter(|contract| contract.chain.eq(chain))
-        .map(|contract| Token::Address(contract.evm_address))
-        .collect::<Vec<Token>>();
-
-    let fixed_bytes: FixedBytes = issue_bytes.into();
-
-    let encoded = publish_audit_function.encode_input(
-        &[
-            Token::Array(contract_tokens),
-            Token::String(report_hash),
-            Token::FixedBytes(project_name.into()),
-            Token::FixedBytes(fixed_bytes),
-        ]
-    )?;
-
-    Ok(encoded)
-}
-
 pub fn serialize_issues<S>(issues: &IssueCount, serializer: S) -> Result<S::Ok, S::Error>
     where S: Serializer
 {
@@ -220,17 +190,4 @@ pub async fn check_update() -> eyre::Result<()> {
     }
 
     Ok(())
-}
-
-#[must_use]
-#[allow(clippy::cast_possible_truncation)]
-pub fn get_issue_bytes(issues: IssueCount) -> [u8; 4] {
-    let risk_accepted = issues.risk_accepted;
-
-    (
-        (u32::from(risk_accepted.critical) << 24) |
-        (u32::from(risk_accepted.high) << 16) |
-        (u32::from(risk_accepted.medium) << 8) |
-        u32::from(risk_accepted.low)
-    ).to_be_bytes()
 }

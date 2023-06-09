@@ -3,7 +3,7 @@
 source .env
 
 add_db() {
-    trustblock-internal add-user-db -d ./tests/test-data/auditor.json -e http://localhost:3000/api/user/auditor -m "$MASTER_KEY"
+    trustblock-internal add-user-db -d ./tests/test-data/auditor.json -e "$USER_ENDPOINT" -m "$MASTER_KEY"
 
     API_KEY=$(mysql -h127.0.0.1 -uuser -ppass local -Bse "SELECT \`key\` FROM ApiKey;")
 
@@ -12,7 +12,7 @@ add_db() {
 
     rm -rf "$CLI_FOLDER" && mkdir "$CLI_FOLDER"
 
-    content_to_append="\nWALLET_KEY=$WALLET_KEY\nAPI_KEY=$API_KEY\nAUDIT_ENDPOINT=$AUDIT_ENDPOINT\nPROJECT_SLUG_ENDPOINT=$PROJECT_SLUG_ENDPOINT\nFORWARDER_ENDPOINT=$FORWARDER_ENDPOINT\nWEB3_STORAGE_API_ENDPOINT=$WEB3_STORAGE_API_ENDPOINT\nTB_CORE_ADDRESS=$TB_CORE_ADDRESS\nPDF_GENERATE_ENDPOINT=$PDF_GENERATE_ENDPOINT"
+    content_to_append="\nAPI_KEY=$API_KEY\nAUDIT_ENDPOINT=$AUDIT_ENDPOINT\nPROJECT_SLUG_ENDPOINT=$PROJECT_SLUG_ENDPOINT\nWEB3_STORAGE_API_ENDPOINT=$WEB3_STORAGE_API_ENDPOINT\nPDF_GENERATE_ENDPOINT=$PDF_GENERATE_ENDPOINT"
 
     # Append the content to the .env file
     echo -e "$content_to_append" >>"$CLI_FOLDER/.env"

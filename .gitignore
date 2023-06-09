@@ -7,3 +7,5 @@
 
 **/.env
 **/.env.*local
+
+/tests/test-data/pdf_reports/.tmp*
