@@ -1,11 +1,9 @@
-Trustblock CLI
-==============
+# Trustblock CLI
 
 Trustblock CLI is a user-friendly command-line utility that helps you interact with Trustblock and publish audit reports.
 Refer to the [Trustblock CLI documentation](https://docs.trustblock.run/technical-documentation/publish-an-audit#using-our-cli) for more detailed information.
 
-Installation
-------------
+## Installation
 
 If you have cargo installed, you can install our CLI via:
 
@@ -13,13 +11,13 @@ If you have cargo installed, you can install our CLI via:
 cargo install trustblock-cli
 ```
 
-For other installation methods please refer to: 
+For other installation methods please refer to:
 
 ```bash
 https://github.com/Trustblock-Inc/trustblock-cli/releases
 ```
-Usage
------
+
+## Usage
 
 To see available subcommands, use the `help` flag:
 
@@ -41,7 +39,7 @@ Before publishing an audit, run the following command to initialize the `~/.trus
 trustblock init
 ```
 
-Next, add your private key from the whitelisted wallet and JWT to the `~/.trustblock/.env` file. You can obtain an API key by navigating to your profile and clicking the "Edit my profile" button on the Trustblock website after authentication.
+Next, add your API key to the `~/.trustblock/.env` file. You can obtain an API key by navigating to your profile and clicking the "Edit my profile" button on the Trustblock website after authentication.
 
 Note: Trustblock CLI can still be used without adding data to the `.env` file, as long as the required information is passed as arguments.
 
@@ -54,7 +52,7 @@ To publish an audit, you can either attach pdf file or specify a web audit URL:
 -u, --report-url <AUDIT_REPORT_URL>
 ```
 
-Example: 
+Example:
 
 ```bash
 trustblock publish-audit -a audit.json -r ./Audit_Report.pdf
@@ -66,30 +64,21 @@ trustblock publish-audit -a audit.json -u https://trustblock.run/my_audit
 
 You can obtain an example _audit.json_ file from https://github.com/Trustblock-Inc/trustblock-cli/blob/main/src/data/audit.json. You should fill in the fields with the appropriate information from your audit.
 
-
 To include api key and private key:
 
 ```bash
--k, --api-key
--p, --private-key
+-a, --api-key
 ```
 
-To also publish to Smart Contracts, add the `--publish-sc` flag:
+## Commands
 
-```bash
- -s, --publish-sc
-```
+-   `publish-audit`: Publishes an audit to Trustblock.
+-   `init`: Initializes the `.trustblock` folder.
+-   `clean`: Cleans the `.trustblock` folder.
+-   `help`: Print this message or the help of the given subcommand(s).
 
-Commands
---------
+## Audit JSON Schema
 
-- `publish-audit`: Publishes an audit to Trustblock.
-- `init`: Initializes the `.trustblock` folder.
-- `clean`: Cleans the `.trustblock` folder.
-- `help`: Print this message or the help of the given subcommand(s).
-
-Audit JSON Schema
---------
 ```json
 {
   "project": {
