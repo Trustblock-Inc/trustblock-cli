@@ -1,12 +1,4 @@
-use ethers::{
-    middleware::SignerMiddleware,
-    prelude::k256::ecdsa::SigningKey,
-    providers::{ Http, Middleware, Provider },
-    signers::{ LocalWallet, Signer, Wallet },
-    types::U256,
-};
-
-use std::{ fs::File, io::BufReader, path::PathBuf, sync::Arc };
+use std::{ fs::File, io::BufReader, path::PathBuf };
 
 use validator::{ validate_email, validate_url };
 
@@ -17,8 +9,6 @@ use serde::de::DeserializeOwned;
 use pdf::file::FileOptions as PdfFile;
 
 use crate::constants::CLI_PATH;
-
-pub type WalletSignerMiddleware = SignerMiddleware<Provider<Http>, Wallet<SigningKey>>;
 
 pub trait Pdf {
     fn pdf_file_check(&self) -> eyre::Result<&PathBuf>;
@@ -81,32 +71,4 @@ pub fn apply_dotenv() -> eyre::Result<()> {
     let env_path = home_dir.join(format!("{CLI_PATH}/.env"));
 
     Ok(dotenv::from_path(env_path.as_path())?)
-}
-
-pub async fn get_client(
-    rpc_url: &str,
-    private_key: Option<String>
-) -> eyre::Result<(Arc<WalletSignerMiddleware>, U256, Wallet<SigningKey>)> {
-    let home_dir = dirs::home_dir().wrap_err("Could not find home directory")?;
-
-    let env_path = home_dir.join(format!("{CLI_PATH}/.env"));
-
-    dotenv::from_path(env_path.as_path())?;
-
-    let wallet_key = match private_key {
-        Some(key) => key,
-        None => std::env::var("WALLET_KEY")?,
-    };
-
-    let provider = Provider::<Http>::try_from(rpc_url)?;
-
-    let chain_id = provider.get_chainid().await?;
-
-    // this wallet's private key
-    let wallet = wallet_key.parse::<LocalWallet>()?.with_chain_id(chain_id.as_u64());
-
-    let provider = SignerMiddleware::new(provider, wallet.clone());
-
-    let client = Arc::new(provider);
-    Ok((client, chain_id, wallet))
 }

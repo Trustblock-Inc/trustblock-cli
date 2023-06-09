@@ -3,6 +3,4 @@
 (?:\[\+\] Uploading .+\. Finished %\d+
 )+\[\+\] Uploading is done
 
-Audit published successfully to DB!
-
-Audit published successfully
+Audit published successfully!

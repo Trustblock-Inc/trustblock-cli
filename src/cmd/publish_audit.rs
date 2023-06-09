@@ -1,20 +1,21 @@
-mod publish_db;
-mod publish_sc;
-
-use crate::types::{ Audit };
-
-use publish_db::publish_audit_db;
-
-use publish_sc::publish_audit_sc;
-
 use crate::{
     cmd::utils::{ upload_ipfs, generate_pdf_from_url },
+    constants::{ AUDIT_ENDPOINT, TRUSTBLOCK_API_KEY_HEADER },
+    types::{ Audit, Chains, Project },
     utils::{ apply_dotenv, parse_json, validate_pdf, validate_links },
 };
 
-use std::path::PathBuf;
+use reqwest::{ Client, StatusCode };
 
 use clap::{ Parser, ValueHint };
+
+use itertools::Itertools;
+
+use serde_json::Value;
+
+use std::path::PathBuf;
+
+use eyre::eyre;
 
 #[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, Parser)]
@@ -54,12 +55,6 @@ pub struct PublishAuditArgs {
 
     #[clap(short = 'k', long)]
     api_key: Option<String>,
-
-    #[clap(short = 'p', long)]
-    private_key: Option<String>,
-
-    #[clap(short = 's', long, help = "Publish an audit to SC", default_value = "false")]
-    publish_sc: bool,
 }
 
 impl PublishAuditArgs {
@@ -85,26 +80,63 @@ impl PublishAuditArgs {
 
         let (report_hash, report_file_url) = upload_ipfs(report_pdf_file_path, &api_key).await?;
 
-        let audit_data = publish_audit_db(
-            audit_data,
-            project_id,
-            report_hash.clone(),
+        let client = Client::new();
+
+        let audit_endpoint = std::env
+            ::var("AUDIT_ENDPOINT")
+            .unwrap_or_else(|_| AUDIT_ENDPOINT.to_string());
+
+        let chains = audit_data.contracts
+            .iter()
+            .map(|contract| contract.chain)
+            .unique()
+            .collect::<Vec<Chains>>();
+
+        let project = Project {
+            id: project_id,
+            ..audit_data.clone().project
+        };
+
+        let audit_data_send = Audit {
+            chains,
+            report_hash: report_hash.clone(),
             report_file_url,
-            &api_key
-        ).await?;
+            project,
+            ..audit_data
+        };
 
-        if self.publish_sc {
-            publish_audit_sc(
-                &audit_data,
-                &audit_data.project.name,
-                report_hash,
-                self.private_key,
-                &api_key
-            ).await?;
+        let response = client
+            .post(audit_endpoint)
+            .header(TRUSTBLOCK_API_KEY_HEADER, api_key)
+            .json(&audit_data_send)
+            .send().await?;
+
+        let status = response.status();
+
+        let body = response.json::<Value>().await?;
+
+        //TODO: create a separate error struct with "thiserror" crate
+        match status {
+            StatusCode::BAD_REQUEST => {
+                let error = &body["error"];
+
+                if error == "Report hash is not a unique value." {
+                    println!("Audit already published to DB!\n");
+                    return Ok(());
+                }
+
+                if error == "Project domain is not a unique value." {
+                    println!("Project already exists on DB!\n");
+                    return Ok(());
+                }
+
+                Err(eyre!("Could not publish to DB. Check validity of the audit data: {body} "))
+            }
+            StatusCode::CREATED => {
+                println!("Audit published successfully!\n");
+                Ok(())
+            }
+            _ => Err(eyre!("Could not publish to DB. Response: {status}")),
         }
-
-        println!("Audit published successfully");
-
-        Ok(())
     }
 }
