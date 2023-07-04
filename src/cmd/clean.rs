@@ -1,8 +1,7 @@
-use crate::{ cmd::utils::Cmd, constants::CLI_PATH };
-
+use clap::Parser;
 use eyre::ContextCompat;
 
-use clap::Parser;
+use crate::{cmd::utils::Cmd, constants::CLI_PATH};
 
 #[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, Parser)]

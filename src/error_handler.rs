@@ -1,7 +1,6 @@
-use eyre::EyreHandler;
-
 use std::error::Error;
 
+use eyre::EyreHandler;
 use yansi::Paint;
 
 /// A custom context type for Trustblock specific error reporting via `eyre`
@@ -12,7 +11,7 @@ impl EyreHandler for Handler {
     fn debug(
         &self,
         error: &(dyn Error + 'static),
-        f: &mut core::fmt::Formatter<'_>
+        f: &mut core::fmt::Formatter<'_>,
     ) -> core::fmt::Result {
         if f.alternate() {
             return core::fmt::Debug::fmt(error, f);

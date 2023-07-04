@@ -1,7 +1,6 @@
-use serde::{ Deserialize, Serialize };
+use serde::{Deserialize, Serialize};
+use trustblock_cli::types::{AuditContract, Chains, Description, IssueCount, Project, Tag};
 use validator::Validate;
-
-use trustblock_cli::types::{ Chains, IssueCount, Tag, AuditContract, Description, Project };
 
 #[derive(Debug, Clone, Serialize, Validate, Deserialize)]
 pub struct MockAudit {

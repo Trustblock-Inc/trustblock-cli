@@ -1,18 +1,14 @@
-use crate::{
-    constants::{ PROJECT_SLUG_ENDPOINT, TRUSTBLOCK_API_KEY_HEADER },
-    types::{ Contact, Links },
-    utils::apply_dotenv,
-};
-
-use serde::{ Deserialize, Serialize };
-
-use reqwest::{ Client, StatusCode, Url };
-
+use color_eyre::eyre::eyre;
+use reqwest::{Client, StatusCode, Url};
+use serde::{Deserialize, Serialize};
+use serde_json::Value;
 use validator::Validate;
 
-use color_eyre::eyre::eyre;
-
-use serde_json::Value;
+use crate::{
+    constants::{PROJECT_SLUG_ENDPOINT, TRUSTBLOCK_API_KEY_HEADER},
+    types::{Contact, Links},
+    utils::apply_dotenv,
+};
 
 #[derive(Debug, Clone, Validate, Serialize, Deserialize)]
 pub struct Project {
@@ -31,15 +27,17 @@ impl Project {
     pub const fn new(
         name: String,
         twitter: Option<String>,
+        telegram: Option<String>,
         github: Option<String>,
         website: Option<String>,
         email: Option<String>,
-        id: Option<String>
+        id: Option<String>,
     ) -> Self {
         Self {
             name,
             links: Links {
                 twitter,
+                telegram,
                 github,
                 website,
             },
@@ -55,8 +53,7 @@ impl Project {
 
         apply_dotenv()?;
 
-        let project_slug_endpoint = std::env
-            ::var("PROJECT_SLUG_ENDPOINT")
+        let project_slug_endpoint = std::env::var("PROJECT_SLUG_ENDPOINT")
             .unwrap_or_else(|_| PROJECT_SLUG_ENDPOINT.to_string());
 
         let slug = url.domain().unwrap_or_default().replace('.', "-");
@@ -64,7 +61,8 @@ impl Project {
         let response = client
             .get(&format!("{project_slug_endpoint}{slug}"))
             .header(TRUSTBLOCK_API_KEY_HEADER, api_key)
-            .send().await?;
+            .send()
+            .await?;
 
         match response.status() {
             StatusCode::NOT_FOUND => Ok(None),
@@ -74,10 +72,10 @@ impl Project {
 
                 Ok(Some(project_id))
             }
-            _ =>
-                Err(
-                    eyre!("Error occurred while fetching a project id: {}", response.text().await?)
-                ),
+            _ => Err(eyre!(
+                "Error occurred while fetching a project id: {}",
+                response.text().await?
+            )),
         }
     }
 }

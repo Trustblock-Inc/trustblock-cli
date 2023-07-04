@@ -85,7 +85,8 @@ To include api key and private key:
     "name": String,
     "links": {
       "website": URL String,
-      "twitter": URL String
+      "twitter": URL String, (optional),
+      "telegram": URL String (optional),
     },
     "contact": {
       "email": Email String

@@ -1,21 +1,17 @@
-use crate::{
-    cmd::utils::{ upload_ipfs, generate_pdf_from_url },
-    constants::{ AUDIT_ENDPOINT, TRUSTBLOCK_API_KEY_HEADER },
-    types::{ Audit, Chains, Project },
-    utils::{ apply_dotenv, parse_json, validate_pdf, validate_links },
-};
-
-use reqwest::{ Client, StatusCode };
-
-use clap::{ Parser, ValueHint };
-
-use itertools::Itertools;
-
-use serde_json::Value;
-
 use std::path::PathBuf;
 
+use clap::{Parser, ValueHint};
 use eyre::eyre;
+use itertools::Itertools;
+use reqwest::{Client, StatusCode};
+use serde_json::Value;
+
+use crate::{
+    cmd::utils::{generate_pdf_from_url, upload_ipfs},
+    constants::{AUDIT_ENDPOINT, TRUSTBLOCK_API_KEY_HEADER},
+    types::{Audit, Chains, Project},
+    utils::{apply_dotenv, parse_json, validate_links, validate_pdf},
+};
 
 #[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, Parser)]
@@ -69,7 +65,11 @@ impl PublishAuditArgs {
             None => std::env::var("API_KEY")?,
         };
 
-        let project_id = audit_data.project.clone().fetch_project_id(&api_key).await?;
+        let project_id = audit_data
+            .project
+            .clone()
+            .fetch_project_id(&api_key)
+            .await?;
 
         let report_pdf_file_path = match self.report_pdf_file_path {
             Some(path) => path,
@@ -82,11 +82,11 @@ impl PublishAuditArgs {
 
         let client = Client::new();
 
-        let audit_endpoint = std::env
-            ::var("AUDIT_ENDPOINT")
-            .unwrap_or_else(|_| AUDIT_ENDPOINT.to_string());
+        let audit_endpoint =
+            std::env::var("AUDIT_ENDPOINT").unwrap_or_else(|_| AUDIT_ENDPOINT.to_string());
 
-        let chains = audit_data.contracts
+        let chains = audit_data
+            .contracts
             .iter()
             .map(|contract| contract.chain)
             .unique()
@@ -109,7 +109,8 @@ impl PublishAuditArgs {
             .post(audit_endpoint)
             .header(TRUSTBLOCK_API_KEY_HEADER, api_key)
             .json(&audit_data_send)
-            .send().await?;
+            .send()
+            .await?;
 
         let status = response.status();
 
@@ -130,7 +131,9 @@ impl PublishAuditArgs {
                     return Ok(());
                 }
 
-                Err(eyre!("Could not publish to DB. Check validity of the audit data: {body} "))
+                Err(eyre!(
+                    "Could not publish to DB. Check validity of the audit data: {body} "
+                ))
             }
             StatusCode::CREATED => {
                 println!("Audit published successfully!\n");

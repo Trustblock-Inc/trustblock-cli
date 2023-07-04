@@ -1,20 +1,15 @@
 mod project;
 
-pub use project::Project;
-
-use ethers_core::types::Address;
-
-use serde::{ Deserialize, Serialize };
-
-use strum::{ EnumIter, EnumString };
-
-use crate::cmd::serialize_issues;
-
-use validator::Validate;
-
 use std::convert::From;
 
 use clap::ValueEnum;
+use ethers_core::types::Address;
+pub use project::Project;
+use serde::{Deserialize, Serialize};
+use strum::{EnumIter, EnumString};
+use validator::Validate;
+
+use crate::cmd::serialize_issues;
 
 #[derive(
     Clone,
@@ -29,7 +24,7 @@ use clap::ValueEnum;
     Default,
     PartialOrd,
     Ord,
-    EnumString
+    EnumString,
 )]
 #[serde(rename_all = "UPPERCASE")]
 #[strum(serialize_all = "UPPERCASE")]
@@ -173,6 +168,8 @@ pub struct Description {
 pub struct Links {
     #[validate(url)]
     pub twitter: Option<String>,
+    #[validate(url)]
+    pub telegram: Option<String>,
     #[validate(url)]
     pub github: Option<String>,
     #[validate(url)]

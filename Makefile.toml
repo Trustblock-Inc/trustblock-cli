@@ -1,12 +1,14 @@
 [tasks.format]
 description = "Format all source files."
-command = "prettier"
-args = ["--write", "**/*.rs"]
+toolchain = "nightly"
+command = "cargo"
+args = ["fmt", "--all"]
 
 [tasks.format-check]
 description = "Check all source files for formatting issues."
-command = "prettier"
-args = ["--check", "**/*.rs"]
+toolchain = "nightly"
+command = "cargo"
+args = ["fmt", "--all", "--check"]
 
 [tasks.lint]
 description = "Lint all source files."

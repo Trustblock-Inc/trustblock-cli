@@ -19,7 +19,7 @@ services:
             retries: 30
 
     app:
-        image: teamauth/webapp:latest
+        image: teamauth/webapp:latest-staging
         container_name: tb-webapp
         depends_on:
             db:

@@ -1,8 +1,8 @@
-use crate::cmd::{ clean::CleanArgs, init::InitArgs, publish_audit::PublishAuditArgs };
-
-use clap::{ command, Parser, Subcommand };
-
 use std::str;
+
+use clap::{command, Parser, Subcommand};
+
+use crate::cmd::{clean::CleanArgs, init::InitArgs, publish_audit::PublishAuditArgs};
 
 #[derive(Debug, Parser)]
 #[command(about = "Trustblock CLI", version)]
@@ -17,9 +17,12 @@ pub enum Commands {
         about = "Publishes an audit to Trustblock",
         arg_required_else_help = true,
         next_line_help = true
-    )] PublishAudit(PublishAuditArgs),
+    )]
+    PublishAudit(PublishAuditArgs),
 
-    #[command(about = "Initializes .trustblock folder")] Init(InitArgs),
+    #[command(about = "Initializes .trustblock folder")]
+    Init(InitArgs),
 
-    #[command(about = "Cleans .trustblock folder")] Clean(CleanArgs),
+    #[command(about = "Cleans .trustblock folder")]
+    Clean(CleanArgs),
 }
