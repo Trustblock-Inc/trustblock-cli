@@ -1,12 +1,9 @@
-use std::{ fs::File, io::BufReader, path::PathBuf };
+use std::{fs::File, io::BufReader, path::PathBuf};
 
-use validator::{ validate_email, validate_url };
-
-use eyre::{ eyre, ContextCompat };
-
-use serde::de::DeserializeOwned;
-
+use eyre::{eyre, ContextCompat};
 use pdf::file::FileOptions as PdfFile;
+use serde::de::DeserializeOwned;
+use validator::{validate_email, validate_url};
 
 use crate::constants::CLI_PATH;
 

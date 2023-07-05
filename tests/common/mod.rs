@@ -1,14 +1,14 @@
 pub mod constants;
-pub mod utils;
 pub mod mock_data;
+pub mod utils;
 
 use std::path::PathBuf;
 
 use mock_data::MockAudit;
-use utils::{ generate_random_audit, generate_random_pdf };
+use utils::{generate_random_audit, generate_random_pdf};
 
 pub fn generate_random_data(
-    project_seed: Option<u64>
+    project_seed: Option<u64>,
 ) -> eyre::Result<(PathBuf, PathBuf, MockAudit)> {
     let pdf_file = generate_random_pdf()?;
 

@@ -1,10 +1,9 @@
-use crate::{ cmd::utils::Cmd, constants::CLI_PATH };
-
-use std::{ fs::File, io::prelude::Write };
-
-use eyre::ContextCompat;
+use std::{fs::File, io::prelude::Write};
 
 use clap::Parser;
+use eyre::ContextCompat;
+
+use crate::{cmd::utils::Cmd, constants::CLI_PATH};
 
 #[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, Parser)]

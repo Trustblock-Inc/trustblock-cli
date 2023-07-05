@@ -3,7 +3,10 @@
 source .env
 
 add_db() {
-    trustblock-internal add-user-db -d ./tests/test-data/auditor.json -e "$USER_ENDPOINT" -m "$MASTER_KEY"
+
+    docker compose exec -T app npx drizzle-kit push:mysql
+
+    trustblock-internal add-user -d ./tests/test-data/auditor.json -e "$USER_ENDPOINT" -m "$MASTER_KEY"
 
     API_KEY=$(mysql -h127.0.0.1 -uuser -ppass local -Bse "SELECT \`key\` FROM ApiKey;")
 
@@ -36,6 +39,5 @@ if [ -z "$(docker ps -f "name=app" -f "status=running" -q)" ]; then
     done
 
 else
-    docker compose exec -T app npx prisma migrate reset -f --skip-generate &&
-        docker compose exec -T app npx prisma db push --skip-generate && add_db
+docker container rm tb-db -v --force && docker compose up -d && add_db
 fi

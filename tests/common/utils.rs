@@ -1,15 +1,16 @@
-use std::{ fs::File, iter::repeat_with, path::PathBuf };
+use std::{fs::File, iter::repeat_with, path::PathBuf};
 
-use crate::common::{ constants::{ FONT_DIR, PDF_REPORTS_PATH }, mock_data::MockAudit };
 use ethers_core::types::Address;
-use sqlx::{ mysql::MySqlPoolOptions, MySql, Pool };
+use sqlx::{mysql::MySqlPoolOptions, MySql, Pool};
 use strum::IntoEnumIterator;
-
-use trustblock_cli::types::{ AuditContract, Chains, IssueCount, Project, SeverityCount };
-
 use tempfile::NamedTempFile;
+use trustblock_cli::types::{AuditContract, Chains, IssueCount, Project, SeverityCount};
 
 use super::constants::AUDIT_JSON_PATH;
+use crate::common::{
+    constants::{FONT_DIR, PDF_REPORTS_PATH},
+    mock_data::MockAudit,
+};
 
 pub fn generate_random_pdf() -> eyre::Result<PathBuf> {
     let default_font_name = "LiberationSans";
@@ -21,7 +22,7 @@ pub fn generate_random_pdf() -> eyre::Result<PathBuf> {
     let default_font = genpdf::fonts::from_files(
         FONT_DIR,
         default_font_name,
-        Some(genpdf::fonts::Builtin::Helvetica)
+        Some(genpdf::fonts::Builtin::Helvetica),
     )?;
 
     let mut doc = genpdf::Document::new(default_font);
@@ -32,11 +33,10 @@ pub fn generate_random_pdf() -> eyre::Result<PathBuf> {
     decorator.set_margins(10);
     doc.set_page_decorator(decorator);
     // Add one or more elements
-    doc.push(
-        genpdf::elements::Paragraph::new(
-            format!("This is an audit report. Description: {}", random_string)
-        )
-    );
+    doc.push(genpdf::elements::Paragraph::new(format!(
+        "This is an audit report. Description: {}",
+        random_string
+    )));
 
     // Render the document and write it to a file
     doc.render_to_file(&pdf_file)?;
@@ -58,14 +58,14 @@ pub fn generate_random_audit(project_seed: Option<u64>) -> eyre::Result<(PathBuf
         fastrand::u8(..5),
         fastrand::u8(..5),
         fastrand::u8(..5),
-        fastrand::u8(..5)
+        fastrand::u8(..5),
     );
 
     let severity_count_fixed = SeverityCount::new(
         fastrand::u8(..5),
         fastrand::u8(..5),
         fastrand::u8(..5),
-        fastrand::u8(..5)
+        fastrand::u8(..5),
     );
 
     let issues = IssueCount::new(severity_count_fixed, severity_count_risk_accepted);
@@ -73,8 +73,8 @@ pub fn generate_random_audit(project_seed: Option<u64>) -> eyre::Result<(PathBuf
     let contracts = repeat_with(|| {
         AuditContract::new(chains[fastrand::usize(..chains.len())], Address::random())
     })
-        .take(5)
-        .collect::<Vec<AuditContract>>();
+    .take(5)
+    .collect::<Vec<AuditContract>>();
 
     let project = generate_random_project(project_seed)?;
 
@@ -105,13 +105,23 @@ pub fn generate_random_project(seed: Option<u64>) -> eyre::Result<Project> {
 
     let twitter = format!("https://twitter.com/{name}");
 
+    let telegram = format!("https://t.me/{name}");
+
     let github = format!("https://github.com/{name}");
 
     let website = format!("https://{name}.com");
 
     let email = format!("{name}@mail.com");
 
-    let project = Project::new(name, Some(twitter), Some(github), Some(website), Some(email), None);
+    let project = Project::new(
+        name,
+        Some(twitter),
+        Some(telegram),
+        Some(github),
+        Some(website),
+        Some(email),
+        None,
+    );
 
     Ok(project)
 }
@@ -119,7 +129,10 @@ pub fn generate_random_project(seed: Option<u64>) -> eyre::Result<Project> {
 pub async fn connect_db() -> eyre::Result<Pool<MySql>> {
     let url = "mysql://user:pass@localhost:3306/local";
 
-    let pool = MySqlPoolOptions::new().max_connections(5).connect(url).await?;
+    let pool = MySqlPoolOptions::new()
+        .max_connections(5)
+        .connect(url)
+        .await?;
 
     Ok(pool)
 }

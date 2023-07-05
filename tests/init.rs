@@ -1,19 +1,19 @@
 mod common;
 
 use assert_cmd::Command;
-
-use serial_test::serial;
-
-use common::constants::{ CLI_PATH, FIXTURES_DIR };
-
+use common::constants::{CLI_PATH, FIXTURES_DIR};
 use predicates::prelude::*;
+use serial_test::serial;
 
 #[test]
 #[ignore]
 #[serial("Serial because it mutates shared state")]
 fn test_init_no_args_success() -> eyre::Result<()> {
     // Cleans .trustblock folder
-    Command::cargo_bin("trustblock")?.arg("clean").assert().success();
+    Command::cargo_bin("trustblock")?
+        .arg("clean")
+        .assert()
+        .success();
 
     let home_dir = dirs::home_dir().expect("Could not find home directory");
 
@@ -30,7 +30,7 @@ fn test_init_no_args_success() -> eyre::Result<()> {
         format!(
             "Generating .trustblock folder...\n\nCreated .env file at \"{}/.env\"\n",
             trustblock_dir.to_string_lossy()
-        )
+        ),
     )?;
 
     Command::cargo_bin("trustblock")?
@@ -45,9 +45,8 @@ fn test_init_no_args_success() -> eyre::Result<()> {
     // Checks if .env file is equal to fixture
     predicate::path::eq_file(env_fixture_path).eval(env_path.as_path());
 
-    let predicate_regenerate_file = predicate::str::contains(
-        format!(".env file already exists at {env_path:?}")
-    );
+    let predicate_regenerate_file =
+        predicate::str::contains(format!(".env file already exists at {env_path:?}"));
 
     // Tries to generate a folder again
     Command::cargo_bin("trustblock")?
@@ -64,7 +63,10 @@ fn test_init_no_args_success() -> eyre::Result<()> {
 #[serial("Serial because it mutates shared state")]
 fn test_init_args_success() -> eyre::Result<()> {
     // Cleans .trustblock folder (if it exists)
-    Command::cargo_bin("trustblock")?.arg("clean").assert().success();
+    Command::cargo_bin("trustblock")?
+        .arg("clean")
+        .assert()
+        .success();
 
     let home_dir = dirs::home_dir().expect("Could not find home directory");
 
@@ -81,7 +83,7 @@ fn test_init_args_success() -> eyre::Result<()> {
         format!(
             "Generating .trustblock folder...\n\nCreated .env file at \"{}/.env\"\n",
             trustblock_dir.to_string_lossy()
-        )
+        ),
     )?;
 
     Command::cargo_bin("trustblock")?

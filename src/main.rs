@@ -1,7 +1,10 @@
 use clap::Parser;
-
 use trustblock_cli::{
-    cmd::{ block_on, trustblock::{ Cli, Commands }, Cmd, check_update },
+    cmd::{
+        block_on, check_update,
+        trustblock::{Cli, Commands},
+        Cmd,
+    },
     constants::CLI_PATH,
     error_handler,
 };
@@ -36,6 +39,7 @@ mod tests {
     #[test]
     fn verify_cli() {
         use clap::CommandFactory;
+
         use super::*;
 
         Cli::command().debug_assert();
